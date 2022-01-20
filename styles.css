@@ -52,3 +52,12 @@ div > button {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
+
+#results{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    min-height: 100vh;
+}

@@ -5,6 +5,16 @@ class Player {
         this.opponent = opponent;
         this.dealer = dealer;
     }
+    isPlayer(){
+        return !this.opponent && !this.dealer
+    }
+    isBusted(){
+        let sum = 0;
+        this.hand.forEach(card => {
+            sum += card.value;
+        })
+        return sum > 21;
+    }
     static players = [];
     static createPlayers(numOfOpponents){
         for(let i = 0; i < numOfOpponents; i++){
@@ -27,7 +37,7 @@ class Deck {
                     if(newCard.value === 'J' || newCard.value === 'Q' || newCard.value === 'K'){
                         newCard.value = 10;
                     } else if (newCard.value === 'A'){
-                        newCard.value = [1,11];
+                        newCard.value = 1;
                     }
                     Deck.deck.push(newCard);
                 })
@@ -60,6 +70,12 @@ const initializeGame = (numOfDecks, numOfOpponents) => {
     Deck.createDeck(numOfDecks);
     Deck.shuffleDeck(Deck.deck);
     Player.createPlayers(numOfOpponents);
+    for(let i = 0; i < 2; i++){
+        Player.players.forEach(player => {
+            player.hand.push(Deck.deck.pop())
+        })
+    }
+
     currentPlayer = Player.players[0];
 }
 
@@ -98,11 +114,9 @@ betBtns.forEach(betBtn => {
             betBtnsDiv.classList.remove('show');
             choiceBtnsDiv.classList.add('show');
         } else if(evt.target.textContent[0] === '+'){
-            currentBet += parseInt(evt.target.textContent.slice(1));
-            currentBet = currentBet <= currentPlayer.chips ? currentBet : currentPlayer.chips;
+            currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
         } else {
-            currentBet -= parseInt(evt.target.textContent.slice(1)) || 0;
-            currentBet = currentBet >= 50 ? currentBet : 50;
+            currentBet = currentBet - parseInt(evt.target.textContent.slice(1)) >= 50 ? currentBet - parseInt(evt.target.textContent.slice(1)): 50;
         }
         document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50.`;
     })
@@ -110,7 +124,20 @@ betBtns.forEach(betBtn => {
 
 choiceBtns.forEach(choiceBtn => {
     choiceBtn.addEventListener('click', (evt) => {
-        return
+        if(!currentPlayer.isPlayer()){
+            return
+        } else if(evt.target.textContent === 'Hit'){
+            currentPlayer.hand.push(Deck.deck.pop());
+            console.log(currentPlayer.hand);
+            if(currentPlayer.isBusted()){
+                choiceBtnsDiv.remove('show');
+                document.querySelector('#results > h1').textContent = 'Bust!';
+                document.getElementById('results').classList.add('show');
+            }
+        } else {
+            choiceBtnsDiv.classList.remove('show');
+
+        }
     })
 })
 
