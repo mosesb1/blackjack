@@ -11,6 +11,15 @@ class Deck {
             })
         }
     }
+    static shuffleDeck(deck){
+        let currentIdx = deck.length, randomIdx;
+        while(currentIdx !== 0) {
+            randomIdx = Math.floor(Math.random()*currentIdx);
+            currentIdx--;
+            [deck[currentIdx], deck[randomIdx]] = [deck[randomIdx], deck[currentIdx]];
+        }
+        // Fisher-Yates shuffle algorithm
+    }
 }
 
 class Card {
@@ -23,3 +32,4 @@ class Card {
     static cards = [2,3,4,5,6,7,8,9,10,'J','Q','K','A'];
     static cardNames = ['two','three','four','five','six','seven','eight','nine','ten','jack','queen','king','ace'];
 }
+
