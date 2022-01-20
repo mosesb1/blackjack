@@ -1,0 +1,35 @@
+#choose-decks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    min-height: 100vh;
+}
+
+#number-of-decks > button {
+    width: 50px;
+    height: 30px;
+}
+
+#choose-opponents {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    min-height: 100vh;
+}
+
+#number-of-opponents > button {
+    width: 50px;
+    height: 30px;
+}
+
+.show {
+    display: flex!important;
+}
+
+.hide {
+    display: none!important;
+}

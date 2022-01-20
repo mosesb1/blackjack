@@ -38,7 +38,5 @@ class Card {
     static cardNames = ['two','three','four','five','six','seven','eight','nine','ten','jack','queen','king','ace'];
 }
 
-Deck.createDeck(2);
-Deck.shuffleDeck();
-console.log(Deck.deck);
+
 
