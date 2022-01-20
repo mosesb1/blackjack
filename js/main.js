@@ -65,7 +65,12 @@ const initializeGame = (numOfDecks, numOfOpponents) => {
 let numOfDecks, numOfOpponents;
 const deckBtns = document.querySelectorAll('#number-of-decks > button');
 const opponentBtns = document.querySelectorAll('#number-of-opponents > button');
+const betBtns = document.querySelectorAll('#bet-options > button');
+const choiceBtns = document.querySelectorAll('#choice-options > button');
+const betBtnsDiv = document.getElementById('betting');
+const choiceBtnsDiv = document.getElementById('choices');
 const opponentBtnsDiv = document.getElementById('choose-opponents');
+
 deckBtns.forEach(deckBtn => {
     deckBtn.addEventListener('click', (evt) => {
         numOfDecks = parseInt(deckBtn.textContent);
@@ -80,6 +85,21 @@ opponentBtns.forEach(opponentBtn => {
         numOfOpponents = parseInt(opponentBtn.textContent);
         opponentBtnsDiv.classList.remove('show');
         initializeGame(numOfDecks, numOfOpponents);
+        betBtnsDiv.classList.add('show');
+    })
+})
+
+betBtns.forEach(betBtn => {
+    betBtn.addEventListener('click', (evt) => {
+        betBtnsDiv.classList.remove('show');
+        choiceBtnsDiv.classList.add('show');
+    })
+})
+
+choiceBtns.forEach(choiceBtn => {
+    choiceBtn.addEventListener('click', (evt) => {
+        choiceBtnsDiv.classList.remove('show')
+        betBtnsDiv.classList.add('show');
     })
 })
 
