@@ -1,3 +1,21 @@
+class Player {
+    constructor(chips, opponent = false, dealer = false){
+        this.chips = chips;
+        this.hand = [];
+        this.opponent = opponent;
+        this.dealer = dealer;
+    }
+    static players = [];
+    static createPlayers(numOfOpponents){
+        for(let i = 0; i < numOfOpponents; i++){
+            const opponent = new Player(1000,true);
+            Player.players.push(opponent);
+        }
+        const player = new Player(1000);
+        const dealer = new Player(1000,false,true);
+        Player.players.push(player, dealer);
+    }
+}
 class Deck {
     constructor(){}
     static deck = [];
@@ -38,5 +56,30 @@ class Card {
     static cardNames = ['two','three','four','five','six','seven','eight','nine','ten','jack','queen','king','ace'];
 }
 
+const initializeGame = (numOfDecks, numOfOpponents) => {
+    Deck.createDeck(numOfDecks);
+    Deck.shuffleDeck(Deck.deck);
+    Player.createPlayers(numOfOpponents);
+}
 
+let numOfDecks, numOfOpponents;
+const deckBtns = document.querySelectorAll('#number-of-decks > button');
+const opponentBtns = document.querySelectorAll('#number-of-opponents > button');
+const opponentBtnsDiv = document.getElementById('choose-opponents');
+deckBtns.forEach(deckBtn => {
+    deckBtn.addEventListener('click', (evt) => {
+        numOfDecks = parseInt(deckBtn.textContent);
+        const deckBtnsDiv = document.getElementById('choose-decks');
+        deckBtnsDiv.classList.add('hide');
+        opponentBtnsDiv.classList.add('show');
+    })
+})
+
+opponentBtns.forEach(opponentBtn => {
+    opponentBtn.addEventListener('click', (evt) => {
+        numOfOpponents = parseInt(opponentBtn.textContent);
+        opponentBtnsDiv.classList.remove('show');
+        initializeGame(numOfDecks, numOfOpponents);
+    })
+})
 
