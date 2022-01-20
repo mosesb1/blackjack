@@ -47,3 +47,8 @@ div > button {
     text-align: center;
     min-height: 100vh;
 }
+
+#bet-options{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}

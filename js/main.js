@@ -60,6 +60,7 @@ const initializeGame = (numOfDecks, numOfOpponents) => {
     Deck.createDeck(numOfDecks);
     Deck.shuffleDeck(Deck.deck);
     Player.createPlayers(numOfOpponents);
+    currentPlayer = Player.players[0];
 }
 
 let numOfDecks, numOfOpponents;
@@ -70,6 +71,8 @@ const choiceBtns = document.querySelectorAll('#choice-options > button');
 const betBtnsDiv = document.getElementById('betting');
 const choiceBtnsDiv = document.getElementById('choices');
 const opponentBtnsDiv = document.getElementById('choose-opponents');
+let currentBet = 50;
+let currentPlayer;
 
 deckBtns.forEach(deckBtn => {
     deckBtn.addEventListener('click', (evt) => {
@@ -91,15 +94,23 @@ opponentBtns.forEach(opponentBtn => {
 
 betBtns.forEach(betBtn => {
     betBtn.addEventListener('click', (evt) => {
-        betBtnsDiv.classList.remove('show');
-        choiceBtnsDiv.classList.add('show');
+        if(evt.target.textContent === 'Bet'){
+            betBtnsDiv.classList.remove('show');
+            choiceBtnsDiv.classList.add('show');
+        } else if(evt.target.textContent[0] === '+'){
+            currentBet += parseInt(evt.target.textContent.slice(1));
+            currentBet = currentBet <= currentPlayer.chips ? currentBet : currentPlayer.chips;
+        } else {
+            currentBet -= parseInt(evt.target.textContent.slice(1)) || 0;
+            currentBet = currentBet >= 50 ? currentBet : 50;
+        }
+        document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50.`;
     })
 })
 
 choiceBtns.forEach(choiceBtn => {
     choiceBtn.addEventListener('click', (evt) => {
-        choiceBtnsDiv.classList.remove('show')
-        betBtnsDiv.classList.add('show');
+        return
     })
 })
 
