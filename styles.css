@@ -28,6 +28,10 @@ div > button {
     display: none!important;
 }
 
+.double {
+    width: 100px
+}
+
 #betting {
     display: none;
     align-items: center;

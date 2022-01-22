@@ -109,7 +109,7 @@ const checkHands = () => {
         endHand();
     } else if (playerSum === 21){
         currentPlayer.winChips(2.5 * currentPlayer.bet);
-        handResult.textContent = `You got a blackjack! You won ${2.5*currentPlayer.bet}!`;
+        handResult.textContent = `You got a blackjack! You won ${1.5*currentPlayer.bet}!`;
         endHand();
     } else if (dealerSum === 21){
         handResult.textContent = 'Dealer got a blackjack!';
@@ -118,6 +118,9 @@ const checkHands = () => {
 }
 
 const endHand = () => {
+    if(document.querySelector('#choice-options > .double')){
+        choiceOptions.removeChild(doubleBtn);
+    }
     choiceBtnsDiv.classList.remove('show');
     const gameResults = document.querySelector('#game-results > h1');
     const handResultsDiv = document.getElementById('hand-results');
@@ -177,7 +180,7 @@ const evaluateResult = () => {
     const handSums = document.querySelector('#hand-results > h2');
     handSums.textContent = `Your hand: ${playerSum}. The dealers hand: ${dealerSum}.`;
     if(dealerSum > 21){
-        handResults.textContent = `The dealer busts! You win ${2*currentPlayer.bet} chips!`;
+        handResults.textContent = `The dealer busts! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
     } else if(dealerSum === playerSum){
         handResults.textContent = `It's a push! You get your ${currentPlayer.bet} chips back!`;
@@ -185,7 +188,7 @@ const evaluateResult = () => {
     } else if(dealerSum > playerSum){
         handResults.textContent = `The dealer wins! You lose ${currentPlayer.bet} chips!`;
     } else {
-        handResults.textContent = `You win! You win ${2*currentPlayer.bet} chips!`;
+        handResults.textContent = `You win! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
     }
     endHand();
@@ -199,6 +202,13 @@ const executeDealerTurn = () => {
         dealerSum += newCard.value;
         console.log(Player.players[1].hand);
     }
+}
+
+const doubleBet = (evt) => {
+    currentPlayer.winChips(currentPlayer.bet);
+    currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
+    currentPlayer.makeBet();
+    choiceOptions.removeChild(doubleBtn);
 }
 
 const chooseNumOfDecks = (evt) => {
@@ -223,6 +233,8 @@ const makeBets = (evt) => {
         choiceBtnsDiv.appendChild(currHand);
         choiceBtnsDiv.classList.add('show');
         checkHands();
+        choiceOptions.appendChild(doubleBtn);
+        doubleBtn.addEventListener('click',doubleBet);
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else {
@@ -233,11 +245,13 @@ const makeBets = (evt) => {
 
 const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
+        if(document.querySelector('#choice-options > .double')){
+            choiceOptions.removeChild(doubleBtn);
+        }
         currentPlayer.hand.push(Deck.deck.pop());
         let newCard = document.createElement('li');
         newCard.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
         document.querySelector('#choices > ul').appendChild(newCard)
-        console.log(currentPlayer.hand);
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
             document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`
@@ -254,10 +268,14 @@ let numOfDecks;
 const deckBtns = document.querySelectorAll('#number-of-decks > button');
 const betBtns = document.querySelectorAll('#bet-options > button');
 const choiceBtns = document.querySelectorAll('#choice-options > button');
+const choiceOptions = document.getElementById('choice-options');
 const betBtnsDiv = document.getElementById('betting');
 const choiceBtnsDiv = document.getElementById('choices');
 const newHandBtn = document.querySelector('#hand-results > button');
 const newGameBtn = document.querySelector('#game-results > button');
+const doubleBtn = document.createElement('button');
+doubleBtn.textContent = 'Double Bet';
+doubleBtn.classList.add('double');
 let currentBet = 50;
 let currentPlayer;
 
