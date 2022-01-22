@@ -83,22 +83,22 @@ const initializeGame = (numOfDecks) => {
     Player.createPlayers();
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            let newCard = Deck.deck.pop();
+            let newCard = drawCard();
             player.hand.push(newCard)
         })
     }
 
     currentPlayer = Player.players[0];
+    currentDealer = Player.players[1];
     document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
     document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
 }
 
 const getPlayerHandSums = () => {
     let playerSum = 0, dealerSum = 0;
-    const player = Player.players[0];
-    const dealer = Player.players[1];
+
     let playerAceCounter = 0;
-    player.hand.forEach(card => {
+    currentPlayer.hand.forEach(card => {
         if(card.name !== 'ace'){
             playerSum += card.value;
         } else {
@@ -106,15 +106,16 @@ const getPlayerHandSums = () => {
         }
     })
     while(playerAceCounter){
-        if(playerSum + 11 > 21){
+        if(playerSum + 11 + (playerAceCounter - 1) > 21){
             playerSum += 1;
         } else {
             playerSum += 11;
         }
         playerAceCounter--;
     }
+
     let dealerAceCounter = 0;
-    dealer.hand.forEach(card => {
+    currentDealer.hand.forEach(card => {
         if(card.name !== 'ace'){
             dealerSum += card.value;
         } else {
@@ -122,7 +123,7 @@ const getPlayerHandSums = () => {
         }
     })
     while(dealerAceCounter){
-        if(dealerSum + 11 > 21){
+        if(dealerSum + 11 + (dealerAceCounter - 1) > 21){
             dealerSum += 1;
         } else {
             dealerSum += 11;
@@ -195,12 +196,12 @@ const dealNewHands = () => {
     while(currentPlayer.hand.length){
         currentPlayer.hand.pop();
     }
-    while(Player.players[1].hand.length){
-        Player.players[1].hand.pop();
+    while(currentDealer.hand.length){
+        currentDealer.hand.pop();
     }
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            let newCard = Deck.deck.pop();
+            let newCard = drawCard();
             player.hand.push(newCard);
         })
     }
@@ -237,11 +238,11 @@ const evaluateResult = () => {
 const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
     while(dealerSum < 17){
-        let newCard = Deck.deck.pop();
-        Player.players[1].hand.push(newCard);
+        let newCard = drawCard();
+        currentDealer.hand.push(newCard);
         dealerSum = getPlayerHandSums()[1];
     }
-    console.log(Player.players[1].hand);
+    console.log(currentDealer.hand);
 }
 
 const removeDouble = () => {
@@ -254,6 +255,10 @@ const removeSurrender = () => {
     if(document.querySelector('#choice-options > .surrender')){
         choiceOptions.removeChild(surrenderBtn);
     }
+}
+
+const drawCard = () => {
+    return Deck.deck.pop()
 }
 
 const doubleBet = (evt) => {
@@ -296,7 +301,7 @@ const makeBets = (evt) => {
         choiceOptions.appendChild(surrenderBtn);
         doubleBtn.addEventListener('click',doubleBet);
         surrenderBtn.addEventListener('click',surrenderHand);
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else {
@@ -309,12 +314,12 @@ const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
         removeDouble();
         removeSurrender();
-        let newCard = Deck.deck.pop();
+        let newCard = drawCard();
         currentPlayer.hand.push(newCard);
         let newCardEl = document.createElement('li');
         newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].name;
         document.querySelector('#choices > ul').appendChild(newCardEl)
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
             document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
@@ -349,7 +354,7 @@ const surrenderBtn = document.createElement('button');
 surrenderBtn.textContent = 'Surrender';
 surrenderBtn.classList.add('surrender');
 let currentBet = 50;
-let currentPlayer;
+let currentPlayer, currentDealer;
 
 deckBtns.forEach(deckBtn => {
     deckBtn.addEventListener('click',chooseNumOfDecks);
