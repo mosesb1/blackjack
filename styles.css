@@ -32,6 +32,10 @@ div > button {
     width: 100px
 }
 
+.surrender {
+    width: 100px;
+}
+
 #betting {
     display: none;
     align-items: center;

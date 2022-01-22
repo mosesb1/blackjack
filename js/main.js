@@ -5,7 +5,6 @@ class Player {
         this.splitHand = [];
         this.split = false;
         this.bet = 0;
-        this.hasAce = false;
         this.dealer = dealer;
     }
     isPlayer(){
@@ -85,9 +84,6 @@ const initializeGame = (numOfDecks) => {
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
             let newCard = Deck.deck.pop();
-            if(newCard.name === 'ace'){
-                player.hasAce = true;
-            }
             player.hand.push(newCard)
         })
     }
@@ -101,50 +97,37 @@ const getPlayerHandSums = () => {
     let playerSum = 0, dealerSum = 0;
     const player = Player.players[0];
     const dealer = Player.players[1];
-    if(player.hasAce){
-        let aceCounter = 0;
-        player.hand.forEach(card => {
-            if(card.name !== 'ace'){
-                playerSum += card.value;
-            } else {
-                aceCounter++;
-            }
-        })
-        while(aceCounter){
-            if(playerSum + 11 > 21){
-                playerSum += 1;
-            } else {
-                playerSum += 11;
-            }
-            aceCounter--;
-        }
-    } else {
-        player.hand.forEach(card => {
+    let playerAceCounter = 0;
+    player.hand.forEach(card => {
+        if(card.name !== 'ace'){
             playerSum += card.value;
-        })
-    }
-
-    if(dealer.hasAce){
-        let aceCounter = 0;
-        dealer.hand.forEach(card => {
-            if(card.name !== 'ace'){
-                dealerSum += card.value;
-            } else {
-                aceCounter++;
-            }
-        })
-        while(aceCounter){
-            if(dealerSum + 11 > 21){
-                dealerSum += 1;
-            } else {
-                dealerSum += 11;
-            }
-            aceCounter--;
+        } else {
+            playerAceCounter++;
         }
-    } else {
-        dealer.hand.forEach(card => {
+    })
+    while(playerAceCounter){
+        if(playerSum + 11 > 21){
+            playerSum += 1;
+        } else {
+            playerSum += 11;
+        }
+        playerAceCounter--;
+    }
+    let dealerAceCounter = 0;
+    dealer.hand.forEach(card => {
+        if(card.name !== 'ace'){
             dealerSum += card.value;
-        })
+        } else {
+            dealerAceCounter++;
+        }
+    })
+    while(dealerAceCounter){
+        if(dealerSum + 11 > 21){
+            dealerSum += 1;
+        } else {
+            dealerSum += 11;
+        }
+        dealerAceCounter--;
     }
     console.log(playerSum,dealerSum);
     return [playerSum, dealerSum]
@@ -175,7 +158,6 @@ const checkHands = () => {
 
 const endHand = () => {
     removeDouble();
-    removeSplit();
     choiceBtnsDiv.classList.remove('show');
     const gameResults = document.querySelector('#game-results > h1');
     const handResultsDiv = document.getElementById('hand-results');
@@ -212,18 +194,13 @@ const startNewHand = (evt) => {
 const dealNewHands = () => {
     while(currentPlayer.hand.length){
         currentPlayer.hand.pop();
-        currentPlayer.hasAce = false;
     }
     while(Player.players[1].hand.length){
         Player.players[1].hand.pop();
-        Player.players[1].hasAce = false;
     }
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
             let newCard = Deck.deck.pop();
-            if(newCard.name === 'ace'){
-                player.hasAce = true;
-            }
             player.hand.push(newCard);
         })
     }
@@ -261,11 +238,8 @@ const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
     while(dealerSum < 17){
         let newCard = Deck.deck.pop();
-        if(newCard === 'ace'){
-            Player.players[1].hasAce = true;
-        }
         Player.players[1].hand.push(newCard);
-        dealerSum += newCard.value;
+        dealerSum = getPlayerHandSums()[1];
     }
     console.log(Player.players[1].hand);
 }
@@ -276,17 +250,10 @@ const removeDouble = () => {
     }
 }
 
-const removeSplit = () => {
-    if(document.querySelector('#choice-options > .split')){
-        choiceOptions.removeChild(splitBtn);
+const removeSurrender = () => {
+    if(document.querySelector('#choice-options > .surrender')){
+        choiceOptions.removeChild(surrenderBtn);
     }
-}
-
-const splitHand = (evt) => {
-    currentPlayer.splitHand.push(currentPlayer.hand.pop());
-    currentPlayer.makeBet();
-    removeSplit();
-    removeDouble();
 }
 
 const doubleBet = (evt) => {
@@ -294,6 +261,13 @@ const doubleBet = (evt) => {
     currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
     currentPlayer.makeBet();
     removeDouble();
+    removeSurrender();
+}
+
+const surrenderHand = (evt) => {
+    currentPlayer.winChips(.5*currentPlayer.bet);
+    document.querySelector('#hand-results > h1').textContent = `You surrendered the hand! You got back ${.5*currentPlayer.bet} chips!`;
+    endHand();
 }
 
 const chooseNumOfDecks = (evt) => {
@@ -310,7 +284,7 @@ const makeBets = (evt) => {
         let currHand = document.createElement('ul');
         currentPlayer.hand.forEach(card => {
             let currCard = document.createElement('li');
-            currCard.textContent = card.value;
+            currCard.textContent = card.name;
             currHand.appendChild(currCard);
         })
         currentPlayer.bet = currentBet;
@@ -319,10 +293,9 @@ const makeBets = (evt) => {
         choiceBtnsDiv.classList.add('show');
         checkHands();
         choiceOptions.appendChild(doubleBtn);
+        choiceOptions.appendChild(surrenderBtn);
         doubleBtn.addEventListener('click',doubleBet);
-        if(currentPlayer.hand[0].value === currentPlayer.hand[1].value || currentPlayer.hand[0].name === currentPlayer.hand[1].name){
-            choiceOptions.appendChild(splitBtn);
-        }
+        surrenderBtn.addEventListener('click',surrenderHand);
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
@@ -335,14 +308,11 @@ const makeBets = (evt) => {
 const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
         removeDouble();
-        removeSplit();
+        removeSurrender();
         let newCard = Deck.deck.pop();
-        if(newCard.name === 'ace'){
-            currentPlayer.hasAce = true;
-        }
         currentPlayer.hand.push(newCard);
         let newCardEl = document.createElement('li');
-        newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
+        newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].name;
         document.querySelector('#choices > ul').appendChild(newCardEl)
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
         if(currentPlayer.isBusted()){
@@ -351,9 +321,9 @@ const makeChoices = (evt) => {
             document.querySelector('#game-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
             endHand();
         } else if(currentPlayer.hand.length >= 5){
-            document.querySelector('#hand-results > h1').textContent = `Five card Charlie! You win ${currentPlayer.bet}!`;
+            document.querySelector('#hand-results > h1').textContent = `Five card Charlie! You win ${2*currentPlayer.bet}!`;
             document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
-            currentPlayer.winChips(2*currentPlayer.bet);
+            currentPlayer.winChips(3*currentPlayer.bet);
             endHand();
         }
     } else if(evt.target.textContent === 'Stand'){
@@ -375,10 +345,9 @@ const newGameBtn = document.querySelector('#game-results > button');
 const doubleBtn = document.createElement('button');
 doubleBtn.textContent = 'Double Bet';
 doubleBtn.classList.add('double');
-const splitBtn = document.createElement('button');
-splitBtn.textContent = 'Split';
-splitBtn.classList.add('split');
-
+const surrenderBtn = document.createElement('button');
+surrenderBtn.textContent = 'Surrender';
+surrenderBtn.classList.add('surrender');
 let currentBet = 50;
 let currentPlayer;
 
