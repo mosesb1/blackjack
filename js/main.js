@@ -13,7 +13,11 @@ class Player {
     isBusted(){
         let sum = 0;
         this.hand.forEach(card => {
-            sum += card.value;
+            if(card.name === 'ace'){
+                sum += card.value[0];
+            } else {
+                sum += card.value;
+            }
         })
         return sum > 21;
     }
@@ -44,7 +48,7 @@ class Deck {
                     if(newCard.value === 'J' || newCard.value === 'Q' || newCard.value === 'K'){
                         newCard.value = 10;
                     } else if (newCard.value === 'A'){
-                        newCard.value = 11;
+                        newCard.value = [1,11];
                     }
                     Deck.deck.push(newCard);
                 })
@@ -90,12 +94,24 @@ const initializeGame = (numOfDecks) => {
 
 const getPlayerHandSums = () => {
     let playerSum = 0, dealerSum = 0;
-    for(let i = 0; i < Player.players[0].hand.length; i++){
-        playerSum += Player.players[0].hand[i].value;
+    const player = Player.players[0];
+    const dealer = Player.players[1];
+    console.log(dealer.hand, player.hand);
+    for(let i = 0; i < player.hand.length; i++){
+        if(player.hand[i].name === 'ace'){
+            playerSum += player.hand[i].value[0];
+        } else {
+            playerSum += Player.players[0].hand[i].value;
+        }
     }
-    for(let i = 0; i < Player.players[1].hand.length; i++){
-        dealerSum += Player.players[1].hand[i].value;
+    for(let i = 0; i < dealer.hand.length; i++){
+        if(dealer.hand[i].name === 'ace'){
+            dealerSum += dealer.hand[i].value[0];
+        } else {
+            dealerSum += Player.players[1].hand[i].value;
+        }
     }
+    console.log(playerSum,dealerSum);
     return [playerSum, dealerSum]
 }
 
@@ -260,10 +276,10 @@ const makeBets = (evt) => {
         checkHands();
         choiceOptions.appendChild(doubleBtn);
         doubleBtn.addEventListener('click',doubleBet);
-        if(currentPlayer.hand[0].value === currentPlayer.hand[1].value){
+        if(currentPlayer.hand[0].value === currentPlayer.hand[1].value || currentPlayer.hand[0].name === currentPlayer.hand[1].name){
             choiceOptions.appendChild(splitBtn);
         }
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].value}.`;
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else {
@@ -280,7 +296,7 @@ const makeChoices = (evt) => {
         let newCard = document.createElement('li');
         newCard.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
         document.querySelector('#choices > ul').appendChild(newCard)
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].value}.`;
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
             document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
