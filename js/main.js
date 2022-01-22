@@ -2,6 +2,8 @@ class Player {
     constructor(chips, dealer = false){
         this.chips = chips;
         this.hand = [];
+        this.splitHand = [];
+        this.split = false;
         this.bet = 0;
         this.dealer = dealer;
     }
@@ -102,17 +104,21 @@ const checkHands = () => {
     let playerSum, dealerSum
     [playerSum, dealerSum] = getPlayerHandSums();
     const handResult = document.querySelector('#hand-results > h1');
+    const handSums = document.querySelector('#hand-results > h2');
     console.log(playerSum, dealerSum);
     if(playerSum === 21 && dealerSum === 21){
         currentPlayer.winChips(currentPlayer.bet);
         handResult.textContent = 'You and the dealer got a blackjack! It\'s a push!';
+        handSums.textContent = '';
         endHand();
     } else if (playerSum === 21){
         currentPlayer.winChips(2.5 * currentPlayer.bet);
         handResult.textContent = `You got a blackjack! You won ${1.5*currentPlayer.bet}!`;
+        handSums.textContent = '';
         endHand();
     } else if (dealerSum === 21){
         handResult.textContent = 'Dealer got a blackjack!';
+        handSums.textContent = '';
         endHand();
     }
 }
@@ -120,6 +126,9 @@ const checkHands = () => {
 const endHand = () => {
     if(document.querySelector('#choice-options > .double')){
         choiceOptions.removeChild(doubleBtn);
+    }
+    if(document.querySelector('#choice-options > .split')){
+        choiceOptions.removeChild(splitBtn);
     }
     choiceBtnsDiv.classList.remove('show');
     const gameResults = document.querySelector('#game-results > h1');
@@ -135,7 +144,7 @@ const endHand = () => {
         gameResults.textContent = 'You ran out of chips! Game over!';
         gameResultsDiv.classList.add('show');
     } else if(currentPlayer.chips > 10000){
-        results.textContent = `You passed 10000 chips! You win!`;
+        gameResults.textContent = `You passed 10000 chips! You win!`;
         gameResultsDiv.classList.add('show');
     } else{
         handResultsDiv.classList.add('show');
@@ -204,6 +213,12 @@ const executeDealerTurn = () => {
     }
 }
 
+const splitHand = (evt) => {
+    currentPlayer.splitHand.push(currentPlayer.hand.pop());
+    currentPlayer.makeBet();
+    choiceOptions.removeChild(splitBtn);
+}
+
 const doubleBet = (evt) => {
     currentPlayer.winChips(currentPlayer.bet);
     currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
@@ -235,6 +250,9 @@ const makeBets = (evt) => {
         checkHands();
         choiceOptions.appendChild(doubleBtn);
         doubleBtn.addEventListener('click',doubleBet);
+        if(currentPlayer.hand[0].value === currentPlayer.hand[1].value){
+            choiceOptions.appendChild(splitBtn);
+        }
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else {
@@ -247,6 +265,9 @@ const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
         if(document.querySelector('#choice-options > .double')){
             choiceOptions.removeChild(doubleBtn);
+        }
+        if(document.querySelector('#choice-options > .split')){
+            choiceOptions.removeChild(splitBtn);
         }
         currentPlayer.hand.push(Deck.deck.pop());
         let newCard = document.createElement('li');
@@ -276,6 +297,10 @@ const newGameBtn = document.querySelector('#game-results > button');
 const doubleBtn = document.createElement('button');
 doubleBtn.textContent = 'Double Bet';
 doubleBtn.classList.add('double');
+const splitBtn = document.createElement('button');
+splitBtn.textContent = 'Split';
+splitBtn.classList.add('split');
+
 let currentBet = 50;
 let currentPlayer;
 
