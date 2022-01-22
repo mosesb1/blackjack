@@ -25,12 +25,11 @@ class Player {
     }
     static players = [];
     static createPlayers(){
-        if(Player.players.length){
-            Player.players.pop();
+        while(Player.players.length){
             Player.players.pop();
         }
         const player = new Player(1000);
-        const dealer = new Player(1000,true);
+        const dealer = new Player(0,true);
         Player.players.push(player, dealer);
     }
 }
@@ -124,12 +123,8 @@ const checkHands = () => {
 }
 
 const endHand = () => {
-    if(document.querySelector('#choice-options > .double')){
-        choiceOptions.removeChild(doubleBtn);
-    }
-    if(document.querySelector('#choice-options > .split')){
-        choiceOptions.removeChild(splitBtn);
-    }
+    removeDouble();
+    removeSplit();
     choiceBtnsDiv.classList.remove('show');
     const gameResults = document.querySelector('#game-results > h1');
     const handResultsDiv = document.getElementById('hand-results');
@@ -187,7 +182,9 @@ const evaluateResult = () => {
     [playerSum, dealerSum] = getPlayerHandSums();
     const handResults = document.querySelector('#hand-results > h1');
     const handSums = document.querySelector('#hand-results > h2');
-    handSums.textContent = `Your hand: ${playerSum}. The dealers hand: ${dealerSum}.`;
+    const handSums2 = document.querySelector('#game-results > h2');
+    handSums.textContent = `Your hand: ${playerSum}. The dealer's hand: ${dealerSum}.`;
+    handSums2.textContent = `Your hand: ${playerSum}. The dealer's hand: ${dealerSum}.`;
     if(dealerSum > 21){
         handResults.textContent = `The dealer busts! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
@@ -213,17 +210,30 @@ const executeDealerTurn = () => {
     }
 }
 
+const removeDouble = () => {
+    if(document.querySelector('#choice-options > .double')){
+        choiceOptions.removeChild(doubleBtn);
+    }
+}
+
+const removeSplit = () => {
+    if(document.querySelector('#choice-options > .split')){
+        choiceOptions.removeChild(splitBtn);
+    }
+}
+
 const splitHand = (evt) => {
     currentPlayer.splitHand.push(currentPlayer.hand.pop());
     currentPlayer.makeBet();
-    choiceOptions.removeChild(splitBtn);
+    removeSplit();
+    removeDouble();
 }
 
 const doubleBet = (evt) => {
     currentPlayer.winChips(currentPlayer.bet);
     currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
     currentPlayer.makeBet();
-    choiceOptions.removeChild(doubleBtn);
+    removeDouble();
 }
 
 const chooseNumOfDecks = (evt) => {
@@ -253,6 +263,7 @@ const makeBets = (evt) => {
         if(currentPlayer.hand[0].value === currentPlayer.hand[1].value){
             choiceOptions.appendChild(splitBtn);
         }
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].value}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else {
@@ -263,19 +274,17 @@ const makeBets = (evt) => {
 
 const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
-        if(document.querySelector('#choice-options > .double')){
-            choiceOptions.removeChild(doubleBtn);
-        }
-        if(document.querySelector('#choice-options > .split')){
-            choiceOptions.removeChild(splitBtn);
-        }
+        removeDouble();
+        removeSplit();
         currentPlayer.hand.push(Deck.deck.pop());
         let newCard = document.createElement('li');
         newCard.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
         document.querySelector('#choices > ul').appendChild(newCard)
+        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].value}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
-            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`
+            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
+            document.querySelector('#game-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
             endHand();
         }
     } else if(evt.target.textContent === 'Stand'){
