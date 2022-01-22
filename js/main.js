@@ -1,12 +1,12 @@
 class Player {
-    constructor(chips, opponent = false, dealer = false){
+    constructor(chips, dealer = false){
         this.chips = chips;
         this.hand = [];
-        this.opponent = opponent;
+        this.bet = 0;
         this.dealer = dealer;
     }
     isPlayer(){
-        return !this.opponent && !this.dealer
+        return !this.dealer
     }
     isBusted(){
         let sum = 0;
@@ -15,14 +15,20 @@ class Player {
         })
         return sum > 21;
     }
+    makeBet(){
+        this.chips -= this.bet;
+    }
+    winChips(chips){
+        this.chips += chips;
+    }
     static players = [];
-    static createPlayers(numOfOpponents){
-        for(let i = 0; i < numOfOpponents; i++){
-            const opponent = new Player(1000,true);
-            Player.players.push(opponent);
+    static createPlayers(){
+        if(Player.players.length){
+            Player.players.pop();
+            Player.players.pop();
         }
         const player = new Player(1000);
-        const dealer = new Player(1000,false,true);
+        const dealer = new Player(1000,true);
         Player.players.push(player, dealer);
     }
 }
@@ -37,7 +43,7 @@ class Deck {
                     if(newCard.value === 'J' || newCard.value === 'Q' || newCard.value === 'K'){
                         newCard.value = 10;
                     } else if (newCard.value === 'A'){
-                        newCard.value = 1;
+                        newCard.value = 11;
                     }
                     Deck.deck.push(newCard);
                 })
@@ -66,10 +72,10 @@ class Card {
     static cardNames = ['two','three','four','five','six','seven','eight','nine','ten','jack','queen','king','ace'];
 }
 
-const initializeGame = (numOfDecks, numOfOpponents) => {
+const initializeGame = (numOfDecks) => {
     Deck.createDeck(numOfDecks);
     Deck.shuffleDeck(Deck.deck);
-    Player.createPlayers(numOfOpponents);
+    Player.createPlayers();
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
             player.hand.push(Deck.deck.pop())
@@ -77,67 +83,195 @@ const initializeGame = (numOfDecks, numOfOpponents) => {
     }
 
     currentPlayer = Player.players[0];
+    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
+    document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
 }
 
-let numOfDecks, numOfOpponents;
+const getPlayerHandSums = () => {
+    let playerSum = 0, dealerSum = 0;
+    for(let i = 0; i < Player.players[0].hand.length; i++){
+        playerSum += Player.players[0].hand[i].value;
+    }
+    for(let i = 0; i < Player.players[1].hand.length; i++){
+        dealerSum += Player.players[1].hand[i].value;
+    }
+    return [playerSum, dealerSum]
+}
+
+const checkHands = () => {
+    let playerSum, dealerSum
+    [playerSum, dealerSum] = getPlayerHandSums();
+    const handResult = document.querySelector('#hand-results > h1');
+    console.log(playerSum, dealerSum);
+    if(playerSum === 21 && dealerSum === 21){
+        currentPlayer.winChips(currentPlayer.bet);
+        handResult.textContent = 'You and the dealer got a blackjack! It\'s a push!';
+        endHand();
+    } else if (playerSum === 21){
+        currentPlayer.winChips(2.5 * currentPlayer.bet);
+        handResult.textContent = `You got a blackjack! You won ${2.5*currentPlayer.bet}!`;
+        endHand();
+    } else if (dealerSum === 21){
+        handResult.textContent = 'Dealer got a blackjack!';
+        endHand();
+    }
+}
+
+const endHand = () => {
+    choiceBtnsDiv.classList.remove('show');
+    const gameResults = document.querySelector('#game-results > h1');
+    const handResultsDiv = document.getElementById('hand-results');
+    const gameResultsDiv = document.getElementById('game-results');
+    newGameBtn.textContent = 'Start New Game';
+    resetHandDisplay();
+    currentBet = 50;
+    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
+    document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
+
+    if(!currentPlayer.chips){
+        gameResults.textContent = 'You ran out of chips! Game over!';
+        gameResultsDiv.classList.add('show');
+    } else if(currentPlayer.chips > 10000){
+        results.textContent = `You passed 10000 chips! You win!`;
+        gameResultsDiv.classList.add('show');
+    } else{
+        handResultsDiv.classList.add('show');
+        return
+    }
+}
+
+const startNewGame = (evt) => {
+    document.getElementById('game-results').classList.remove('show');
+    document.getElementById('choose-decks').classList.remove('hide');
+}
+
+const startNewHand = (evt) => {
+    document.getElementById('hand-results').classList.remove('show');
+    dealNewHands();
+    betBtnsDiv.classList.add('show');
+}
+
+const dealNewHands = () => {
+    while(currentPlayer.hand.length){
+        currentPlayer.hand.pop();
+    }
+    while(Player.players[1].hand.length){
+        Player.players[1].hand.pop();
+    }
+    for(let i = 0; i < 2; i++){
+        Player.players.forEach(player => {
+            player.hand.push(Deck.deck.pop())
+        })
+    }
+}
+
+const resetHandDisplay = () => {
+    const handUl = document.querySelector('#choices > ul');
+    choiceBtnsDiv.removeChild(handUl);
+}
+
+const evaluateResult = () => {
+    let playerSum, dealerSum;
+    [playerSum, dealerSum] = getPlayerHandSums();
+    const handResults = document.querySelector('#hand-results > h1');
+    const handSums = document.querySelector('#hand-results > h2');
+    handSums.textContent = `Your hand: ${playerSum}. The dealers hand: ${dealerSum}.`;
+    if(dealerSum > 21){
+        handResults.textContent = `The dealer busts! You win ${2*currentPlayer.bet} chips!`;
+        currentPlayer.winChips(2*currentPlayer.bet);
+    } else if(dealerSum === playerSum){
+        handResults.textContent = `It's a push! You get your ${currentPlayer.bet} chips back!`;
+        currentPlayer.winChips(currentPlayer.bet);
+    } else if(dealerSum > playerSum){
+        handResults.textContent = `The dealer wins! You lose ${currentPlayer.bet} chips!`;
+    } else {
+        handResults.textContent = `You win! You win ${2*currentPlayer.bet} chips!`;
+        currentPlayer.winChips(2*currentPlayer.bet);
+    }
+    endHand();
+}
+
+const executeDealerTurn = () => {
+    let [playerSum, dealerSum] = getPlayerHandSums();
+    while(dealerSum < 17){
+        let newCard = Deck.deck.pop();
+        Player.players[1].hand.push(newCard);
+        dealerSum += newCard.value;
+        console.log(Player.players[1].hand);
+    }
+}
+
+const chooseNumOfDecks = (evt) => {
+    numOfDecks = parseInt(evt.target.textContent);
+    const deckBtnsDiv = document.getElementById('choose-decks');
+    deckBtnsDiv.classList.add('hide');
+    initializeGame(numOfDecks);
+    betBtnsDiv.classList.add('show');
+}
+
+const makeBets = (evt) => {
+    if(evt.target.textContent === 'Bet'){
+        betBtnsDiv.classList.remove('show');
+        let currHand = document.createElement('ul');
+        currentPlayer.hand.forEach(card => {
+            let currCard = document.createElement('li');
+            currCard.textContent = card.value;
+            currHand.appendChild(currCard);
+        })
+        currentPlayer.bet = currentBet;
+        currentPlayer.makeBet();
+        choiceBtnsDiv.appendChild(currHand);
+        choiceBtnsDiv.classList.add('show');
+        checkHands();
+    } else if(evt.target.textContent[0] === '+'){
+        currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
+    } else {
+        currentBet = currentBet - parseInt(evt.target.textContent.slice(1)) >= 50 ? currentBet - parseInt(evt.target.textContent.slice(1)): Math.min(50,currentPlayer.chips);
+    }
+    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`;
+}
+
+const makeChoices = (evt) => {
+    if(evt.target.textContent === 'Hit'){
+        currentPlayer.hand.push(Deck.deck.pop());
+        let newCard = document.createElement('li');
+        newCard.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
+        document.querySelector('#choices > ul').appendChild(newCard)
+        console.log(currentPlayer.hand);
+        if(currentPlayer.isBusted()){
+            document.querySelector('#hand-results > h1').textContent = 'Bust!';
+            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`
+            endHand();
+        }
+    } else if(evt.target.textContent === 'Stand'){
+        choiceBtnsDiv.classList.remove('show');
+        executeDealerTurn();
+        evaluateResult();
+    }
+}
+
+let numOfDecks;
 const deckBtns = document.querySelectorAll('#number-of-decks > button');
-const opponentBtns = document.querySelectorAll('#number-of-opponents > button');
 const betBtns = document.querySelectorAll('#bet-options > button');
 const choiceBtns = document.querySelectorAll('#choice-options > button');
 const betBtnsDiv = document.getElementById('betting');
 const choiceBtnsDiv = document.getElementById('choices');
-const opponentBtnsDiv = document.getElementById('choose-opponents');
+const newHandBtn = document.querySelector('#hand-results > button');
+const newGameBtn = document.querySelector('#game-results > button');
 let currentBet = 50;
 let currentPlayer;
 
 deckBtns.forEach(deckBtn => {
-    deckBtn.addEventListener('click', (evt) => {
-        numOfDecks = parseInt(deckBtn.textContent);
-        const deckBtnsDiv = document.getElementById('choose-decks');
-        deckBtnsDiv.classList.add('hide');
-        opponentBtnsDiv.classList.add('show');
-    })
-})
-
-opponentBtns.forEach(opponentBtn => {
-    opponentBtn.addEventListener('click', (evt) => {
-        numOfOpponents = parseInt(opponentBtn.textContent);
-        opponentBtnsDiv.classList.remove('show');
-        initializeGame(numOfDecks, numOfOpponents);
-        betBtnsDiv.classList.add('show');
-    })
+    deckBtn.addEventListener('click',chooseNumOfDecks);
 })
 
 betBtns.forEach(betBtn => {
-    betBtn.addEventListener('click', (evt) => {
-        if(evt.target.textContent === 'Bet'){
-            betBtnsDiv.classList.remove('show');
-            choiceBtnsDiv.classList.add('show');
-        } else if(evt.target.textContent[0] === '+'){
-            currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
-        } else {
-            currentBet = currentBet - parseInt(evt.target.textContent.slice(1)) >= 50 ? currentBet - parseInt(evt.target.textContent.slice(1)): 50;
-        }
-        document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50.`;
-    })
+    betBtn.addEventListener('click',makeBets);
 })
 
 choiceBtns.forEach(choiceBtn => {
-    choiceBtn.addEventListener('click', (evt) => {
-        if(!currentPlayer.isPlayer()){
-            return
-        } else if(evt.target.textContent === 'Hit'){
-            currentPlayer.hand.push(Deck.deck.pop());
-            console.log(currentPlayer.hand);
-            if(currentPlayer.isBusted()){
-                choiceBtnsDiv.remove('show');
-                document.querySelector('#results > h1').textContent = 'Bust!';
-                document.getElementById('results').classList.add('show');
-            }
-        } else {
-            choiceBtnsDiv.classList.remove('show');
-
-        }
-    })
+    choiceBtn.addEventListener('click',makeChoices);
 })
 
+newHandBtn.addEventListener('click',startNewHand);
+newGameBtn.addEventListener('click',startNewGame);

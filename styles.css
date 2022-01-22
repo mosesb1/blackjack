@@ -12,15 +12,13 @@ div > button {
     min-height: 100vh;
 }
 
-#choose-opponents {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    min-height: 100vh;
+#hand-results > button {
+    width: 120px;
 }
 
+#game-results > button {
+    width: 120px;
+}
 
 .show {
     display: flex!important;
@@ -53,7 +51,16 @@ div > button {
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-#results{
+#hand-results{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    min-height: 100vh;
+}
+
+#game-results{
     display: none;
     align-items: center;
     justify-content: center;
