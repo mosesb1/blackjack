@@ -72,7 +72,7 @@ class Card {
         this.value = value;
         this.suit = suit;
     }
-    static suits = ['heart','club','spade','diamond'];
+    static suits = ['hearts','clubs','spades','diams'];
     static cards = [2,3,4,5,6,7,8,9,10,'J','Q','K','A'];
     static cardNames = ['two','three','four','five','six','seven','eight','nine','ten','jack','queen','king','ace'];
 }
@@ -258,7 +258,28 @@ const removeSurrender = () => {
 }
 
 const drawCard = () => {
-    return Deck.deck.pop()
+    let newCard = Deck.deck.pop();
+    createCard(newCard);
+    return newCard;
+}
+
+const createCard = (card) => {
+    const cardFrame = document.createElement('div');
+    cardFrame.classList.add('card');
+    ['spades','clubs'].includes(card.suit) ? cardFrame.classList.add('black') : cardFrame.classList.add('red');
+    const cardValue = document.createElement('p');
+    cardValue.classList.add('card-value');
+    if(['ace','jack','queen','king'].includes(card.name)){
+        cardValue.textContent = card.name[0].toUpperCase();
+    } else {
+        cardValue.textContent = card.value;
+    }
+    const cardSuit = document.createElement('p');
+    cardSuit.classList.add('card-suit');
+    cardSuit.innerHTML = `&${card.suit};`;
+    cardFrame.appendChild(cardValue);
+    cardFrame.appendChild(cardSuit);
+    document.querySelector('#cards').append(cardFrame);
 }
 
 const doubleBet = (evt) => {

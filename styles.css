@@ -76,3 +76,36 @@ div > button {
     text-align: center;
     min-height: 100vh;
 }
+
+.card{
+    border: .2em solid black;
+    border-radius: 10%;
+    height: 100px;
+    width: 70px;
+    margin-right: 5px;
+    float: left;
+    background-color: white;
+}
+
+.card-value{
+    margin: 0;
+    margin-top: 15%;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0;  
+}
+
+.card-suit{
+    text-align: center;
+    margin: 0;
+    font-size: 2em;
+}
+
+.red {
+    color: red;
+}
+
+.black {
+    color: black;
+}
