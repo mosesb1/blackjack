@@ -78,16 +78,16 @@ class Card {
 }
 
 const initializeGame = (numOfDecks) => {
+    resetHandDivs();
     Deck.createDeck(numOfDecks);
     Deck.shuffleDeck(Deck.deck);
     Player.createPlayers();
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            let newCard = drawCard();
+            let newCard = drawCard(player);
             player.hand.push(newCard)
         })
     }
-
     currentPlayer = Player.players[0];
     currentDealer = Player.players[1];
     document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
@@ -188,6 +188,7 @@ const startNewGame = (evt) => {
 
 const startNewHand = (evt) => {
     document.getElementById('hand-results').classList.remove('show');
+    resetHandDivs();
     dealNewHands();
     betBtnsDiv.classList.add('show');
 }
@@ -199,12 +200,30 @@ const dealNewHands = () => {
     while(currentDealer.hand.length){
         currentDealer.hand.pop();
     }
+
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            let newCard = drawCard();
+            let newCard = drawCard(player);
             player.hand.push(newCard);
         })
     }
+}
+
+const resetHandDivs = () => {
+    const dealerHand = document.getElementById('dealer-cards');
+    const playerHand = document.getElementById('player-cards');
+    const dealerLabel = document.createElement('h2');
+    const playerLabel = document.createElement('h2');
+    dealerLabel.textContent = 'Dealer:';
+    playerLabel.textContent = 'Player:';
+    while(dealerHand.hasChildNodes()){
+        dealerHand.removeChild(dealerHand.lastChild);
+    }
+    while(playerHand.hasChildNodes()){
+        playerHand.removeChild(playerHand.lastChild);
+    }
+    dealerHand.appendChild(dealerLabel);
+    playerHand.appendChild(playerLabel);
 }
 
 const resetHandDisplay = () => {
@@ -238,7 +257,7 @@ const evaluateResult = () => {
 const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
     while(dealerSum < 17){
-        let newCard = drawCard();
+        let newCard = drawCard(currentDealer);
         currentDealer.hand.push(newCard);
         dealerSum = getPlayerHandSums()[1];
     }
@@ -257,13 +276,13 @@ const removeSurrender = () => {
     }
 }
 
-const drawCard = () => {
+const drawCard = (player) => {
     let newCard = Deck.deck.pop();
-    createCard(newCard);
+    createCard(newCard, player);
     return newCard;
 }
 
-const createCard = (card) => {
+const createCard = (card, player) => {
     const cardFrame = document.createElement('div');
     cardFrame.classList.add('card');
     ['spades','clubs'].includes(card.suit) ? cardFrame.classList.add('black') : cardFrame.classList.add('red');
@@ -279,7 +298,11 @@ const createCard = (card) => {
     cardSuit.innerHTML = `&${card.suit};`;
     cardFrame.appendChild(cardValue);
     cardFrame.appendChild(cardSuit);
-    document.querySelector('#cards').append(cardFrame);
+    if(player.dealer){
+        document.getElementById('dealer-cards').appendChild(cardFrame);
+    }else{
+        document.getElementById('player-cards').appendChild(cardFrame);
+    }
 }
 
 const doubleBet = (evt) => {
@@ -335,7 +358,7 @@ const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
         removeDouble();
         removeSurrender();
-        let newCard = drawCard();
+        let newCard = drawCard(currentPlayer);
         currentPlayer.hand.push(newCard);
         let newCardEl = document.createElement('li');
         newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].name;

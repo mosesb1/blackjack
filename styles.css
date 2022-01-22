@@ -109,3 +109,10 @@ div > button {
 .black {
     color: black;
 }
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
