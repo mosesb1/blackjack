@@ -5,6 +5,7 @@ class Player {
         this.splitHand = [];
         this.split = false;
         this.bet = 0;
+        this.hasAce = false;
         this.dealer = dealer;
     }
     isPlayer(){
@@ -83,7 +84,11 @@ const initializeGame = (numOfDecks) => {
     Player.createPlayers();
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            player.hand.push(Deck.deck.pop())
+            let newCard = Deck.deck.pop();
+            if(newCard.name === 'ace'){
+                player.hasAce = true;
+            }
+            player.hand.push(newCard)
         })
     }
 
@@ -96,20 +101,50 @@ const getPlayerHandSums = () => {
     let playerSum = 0, dealerSum = 0;
     const player = Player.players[0];
     const dealer = Player.players[1];
-    console.log(dealer.hand, player.hand);
-    for(let i = 0; i < player.hand.length; i++){
-        if(player.hand[i].name === 'ace'){
-            playerSum += player.hand[i].value[0];
-        } else {
-            playerSum += Player.players[0].hand[i].value;
+    if(player.hasAce){
+        let aceCounter = 0;
+        player.hand.forEach(card => {
+            if(card.name !== 'ace'){
+                playerSum += card.value;
+            } else {
+                aceCounter++;
+            }
+        })
+        while(aceCounter){
+            if(playerSum + 11 > 21){
+                playerSum += 1;
+            } else {
+                playerSum += 11;
+            }
+            aceCounter--;
         }
+    } else {
+        player.hand.forEach(card => {
+            playerSum += card.value;
+        })
     }
-    for(let i = 0; i < dealer.hand.length; i++){
-        if(dealer.hand[i].name === 'ace'){
-            dealerSum += dealer.hand[i].value[0];
-        } else {
-            dealerSum += Player.players[1].hand[i].value;
+
+    if(dealer.hasAce){
+        let aceCounter = 0;
+        dealer.hand.forEach(card => {
+            if(card.name !== 'ace'){
+                dealerSum += card.value;
+            } else {
+                aceCounter++;
+            }
+        })
+        while(aceCounter){
+            if(dealerSum + 11 > 21){
+                dealerSum += 1;
+            } else {
+                dealerSum += 11;
+            }
+            aceCounter--;
         }
+    } else {
+        dealer.hand.forEach(card => {
+            dealerSum += card.value;
+        })
     }
     console.log(playerSum,dealerSum);
     return [playerSum, dealerSum]
@@ -177,13 +212,19 @@ const startNewHand = (evt) => {
 const dealNewHands = () => {
     while(currentPlayer.hand.length){
         currentPlayer.hand.pop();
+        currentPlayer.hasAce = false;
     }
     while(Player.players[1].hand.length){
         Player.players[1].hand.pop();
+        Player.players[1].hasAce = false;
     }
     for(let i = 0; i < 2; i++){
         Player.players.forEach(player => {
-            player.hand.push(Deck.deck.pop())
+            let newCard = Deck.deck.pop();
+            if(newCard.name === 'ace'){
+                player.hasAce = true;
+            }
+            player.hand.push(newCard);
         })
     }
 }
@@ -220,10 +261,13 @@ const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
     while(dealerSum < 17){
         let newCard = Deck.deck.pop();
+        if(newCard === 'ace'){
+            Player.players[1].hasAce = true;
+        }
         Player.players[1].hand.push(newCard);
         dealerSum += newCard.value;
-        console.log(Player.players[1].hand);
     }
+    console.log(Player.players[1].hand);
 }
 
 const removeDouble = () => {
@@ -292,15 +336,24 @@ const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
         removeDouble();
         removeSplit();
-        currentPlayer.hand.push(Deck.deck.pop());
-        let newCard = document.createElement('li');
-        newCard.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
-        document.querySelector('#choices > ul').appendChild(newCard)
+        let newCard = Deck.deck.pop();
+        if(newCard.name === 'ace'){
+            currentPlayer.hasAce = true;
+        }
+        currentPlayer.hand.push(newCard);
+        let newCardEl = document.createElement('li');
+        newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].value;
+        document.querySelector('#choices > ul').appendChild(newCardEl)
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${Player.players[1].hand[0].name}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
             document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
             document.querySelector('#game-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
+            endHand();
+        } else if(currentPlayer.hand.length >= 5){
+            document.querySelector('#hand-results > h1').textContent = `Five card Charlie! You win ${currentPlayer.bet}!`;
+            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
+            currentPlayer.winChips(2*currentPlayer.bet);
             endHand();
         }
     } else if(evt.target.textContent === 'Stand'){
