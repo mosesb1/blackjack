@@ -2,13 +2,8 @@ class Player {
     constructor(chips, dealer = false){
         this.chips = chips;
         this.hand = [];
-        this.splitHand = [];
-        this.split = false;
         this.bet = 0;
         this.dealer = dealer;
-    }
-    isPlayer(){
-        return !this.dealer
     }
     isBusted(){
         let sum = 0;
@@ -184,6 +179,14 @@ const endHand = () => {
 const startNewGame = (evt) => {
     document.getElementById('game-results').classList.remove('show');
     document.getElementById('choose-decks').classList.remove('hide');
+    const dealerCards = document.getElementById('dealer-cards');
+    const playerCards = document.getElementById('player-cards');
+    while(dealerCards.hasChildNodes()){
+        dealerCards.removeChild(dealerCards.lastChild);
+    }
+    while(playerCards.hasChildNodes()){
+        playerCards.removeChild(playerCards.lastChild);
+    }
 }
 
 const startNewHand = (evt) => {
