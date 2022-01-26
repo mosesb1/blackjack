@@ -177,12 +177,10 @@ const endHand = () => {
 }
 
 const startNewGame = (evt) => {
-    document.getElementById('dealer-cards').classList.remove('show');
-    document.getElementById('player-cards').classList.remove('show');
+    dealerCards.classList.remove('show');
+    playerCards.classList.remove('show');
     document.getElementById('game-results').classList.remove('show');
     difficultyDiv.classList.remove('hide');
-    const dealerCards = document.getElementById('dealer-cards');
-    const playerCards = document.getElementById('player-cards');
     while(dealerCards.hasChildNodes()){
         dealerCards.removeChild(dealerCards.lastChild);
     }
@@ -192,8 +190,8 @@ const startNewGame = (evt) => {
 }
 
 const startNewHand = (evt) => {
-    document.getElementById('dealer-cards').classList.remove('show');
-    document.getElementById('player-cards').classList.remove('show');
+    dealerCards.classList.remove('show');
+    playerCards.classList.remove('show');
     document.getElementById('hand-results').classList.remove('show');
     resetHandDivs();
     dealNewHands();
@@ -217,20 +215,18 @@ const dealNewHands = () => {
 }
 
 const resetHandDivs = () => {
-    const dealerHand = document.getElementById('dealer-cards');
-    const playerHand = document.getElementById('player-cards');
     const dealerLabel = document.createElement('h2');
     const playerLabel = document.createElement('h2');
     dealerLabel.textContent = 'Dealer:';
     playerLabel.textContent = 'Player:';
-    while(dealerHand.hasChildNodes()){
-        dealerHand.removeChild(dealerHand.lastChild);
+    while(dealerCards.hasChildNodes()){
+        dealerCards.removeChild(dealerCards.lastChild);
     }
-    while(playerHand.hasChildNodes()){
-        playerHand.removeChild(playerHand.lastChild);
+    while(playerCards.hasChildNodes()){
+        playerCards.removeChild(playerCards.lastChild);
     }
-    dealerHand.appendChild(dealerLabel);
-    playerHand.appendChild(playerLabel);
+    dealerCards.appendChild(dealerLabel);
+    playerCards.appendChild(playerLabel);
 }
 
 const evaluateResult = () => {
@@ -305,9 +301,9 @@ const createCard = (card, player) => {
             cardValue.classList.add('hidden-card-front');
             cardSuit.classList.add('hidden-card-front');
         }
-        document.getElementById('dealer-cards').appendChild(cardFrame);
+        dealerCards.appendChild(cardFrame);
     }else{
-        document.getElementById('player-cards').appendChild(cardFrame);
+        playerCards.appendChild(cardFrame);
     }
 }
 
@@ -343,8 +339,8 @@ const makeBets = (evt) => {
         choiceOptions.appendChild(surrenderBtn);
         doubleBtn.addEventListener('click',doubleBet);
         surrenderBtn.addEventListener('click',surrenderHand);
-        document.getElementById('dealer-cards').classList.add('show');
-        document.getElementById('player-cards').classList.add('show');
+        dealerCards.classList.add('show');
+        playerCards.classList.add('show');
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
@@ -388,6 +384,8 @@ const chooseDifficulty = (evt) => {
 }
 
 let numOfDecks;
+const playerCards = document.getElementById('player-cards');
+const dealerCards = document.getElementById('dealer-cards');
 const difficultyBtns = document.querySelectorAll('#chip-total > button');
 const difficultyDiv = document.getElementById('choose-difficulty');
 const deckBtns = document.querySelectorAll('#number-of-decks > button');
