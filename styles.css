@@ -1,23 +1,29 @@
 div > button {
-    width: 50px;
-    height: 30px;
+    width: 100px;
+    height: 50px;
+    font-size: 1.5em;
+    font-weight: bold;
+    background-color: #FFDB58;
 }
 
-#choose-decks {
+#choose-difficulty {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
     min-height: 100vh;
+    width: 100%;
 }
 
 #hand-results > button {
-    width: 120px;
+    width: 150px;
+    height: 60px;
 }
 
 #game-results > button {
-    width: 120px;
+    width: 150px;
+    height: 60px;
 }
 
 .show {
@@ -29,20 +35,21 @@ div > button {
 }
 
 .double {
-    width: 100px
+    width: 150px
 }
 
 .surrender {
-    width: 100px;
+    width: 150px;
 }
 
-#betting, #choices, #hand-results, #game-results {
+#betting, #choices, #hand-results, #game-results, #choose-decks {
     display: none;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
     min-height: 100vh;
+    width: 100%;
 }
 
 #bet-options{
@@ -92,6 +99,7 @@ body{
     justify-content: center;
     align-items: center;
     background-color: green;
+    width: 100%
 }
 
 .cards {

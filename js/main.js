@@ -125,7 +125,6 @@ const getPlayerHandSums = () => {
         }
         dealerAceCounter--;
     }
-    console.log(playerSum,dealerSum);
     return [playerSum, dealerSum]
 }
 
@@ -134,7 +133,6 @@ const checkHands = () => {
     [playerSum, dealerSum] = getPlayerHandSums();
     const handResult = document.querySelector('#hand-results > h1');
     const handSums = document.querySelector('#hand-results > h2');
-    console.log(playerSum, dealerSum);
     if(playerSum === 21 && dealerSum === 21){
         currentPlayer.winChips(currentPlayer.bet);
         handResult.textContent = 'You and the dealer got a blackjack! It\'s a push!';
@@ -169,7 +167,7 @@ const endHand = () => {
     if(!currentPlayer.chips){
         gameResults.textContent = 'You ran out of chips! Game over!';
         gameResultsDiv.classList.add('show');
-    } else if(currentPlayer.chips > 10000){
+    } else if(currentPlayer.chips > chipGoal){
         gameResults.textContent = `You passed 10000 chips! You win!`;
         gameResultsDiv.classList.add('show');
     } else{
@@ -182,7 +180,7 @@ const startNewGame = (evt) => {
     document.getElementById('dealer-cards').classList.remove('show');
     document.getElementById('player-cards').classList.remove('show');
     document.getElementById('game-results').classList.remove('show');
-    document.getElementById('choose-decks').classList.remove('hide');
+    difficultyDiv.classList.remove('hide');
     const dealerCards = document.getElementById('dealer-cards');
     const playerCards = document.getElementById('player-cards');
     while(dealerCards.hasChildNodes()){
@@ -265,7 +263,6 @@ const executeDealerTurn = () => {
         currentDealer.hand.push(newCard);
         dealerSum = getPlayerHandSums()[1];
     }
-    console.log(currentDealer.hand);
 }
 
 const removeDoubleBtn = () => {
@@ -330,8 +327,7 @@ const surrenderHand = (evt) => {
 
 const chooseNumOfDecks = (evt) => {
     numOfDecks = parseInt(evt.target.textContent);
-    const deckBtnsDiv = document.getElementById('choose-decks');
-    deckBtnsDiv.classList.add('hide');
+    deckBtnsDiv.classList.remove('show');
     initializeGame(numOfDecks);
     betBtnsDiv.classList.add('show');
 }
@@ -385,8 +381,17 @@ const makeChoices = (evt) => {
     }
 }
 
+const chooseDifficulty = (evt) => {
+    chipGoal = parseInt(evt.target.textContent);
+    difficultyDiv.classList.add('hide');
+    deckBtnsDiv.classList.add('show');
+}
+
 let numOfDecks;
+const difficultyBtns = document.querySelectorAll('#chip-total > button');
+const difficultyDiv = document.getElementById('choose-difficulty');
 const deckBtns = document.querySelectorAll('#number-of-decks > button');
+const deckBtnsDiv = document.getElementById('choose-decks');
 const betBtns = document.querySelectorAll('#bet-options > button');
 const choiceBtns = document.querySelectorAll('#choice-options > button');
 const choiceOptions = document.getElementById('choice-options');
@@ -401,7 +406,11 @@ const surrenderBtn = document.createElement('button');
 surrenderBtn.textContent = 'Surrender';
 surrenderBtn.classList.add('surrender');
 let currentBet = 50;
-let currentPlayer, currentDealer;
+let currentPlayer, currentDealer, chipGoal;
+
+difficultyBtns.forEach(difficultyBtn => {
+    difficultyBtn.addEventListener('click', chooseDifficulty);
+})
 
 deckBtns.forEach(deckBtn => {
     deckBtn.addEventListener('click',chooseNumOfDecks);
