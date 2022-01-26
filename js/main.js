@@ -177,6 +177,8 @@ const endHand = () => {
 }
 
 const startNewGame = (evt) => {
+    document.getElementById('dealer-cards').classList.remove('show');
+    document.getElementById('player-cards').classList.remove('show');
     document.getElementById('game-results').classList.remove('show');
     document.getElementById('choose-decks').classList.remove('hide');
     const dealerCards = document.getElementById('dealer-cards');
@@ -259,6 +261,10 @@ const evaluateResult = () => {
 
 const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
+    const cardFrames = document.querySelectorAll('#dealer-cards > .hidden-frame');
+    cardFrames.forEach(cardFrame => {
+        cardFrame.classList.remove('hidden-frame');
+    })
     while(dealerSum < 17){
         let newCard = drawCard(currentDealer);
         currentDealer.hand.push(newCard);
@@ -302,6 +308,11 @@ const createCard = (card, player) => {
     cardFrame.appendChild(cardValue);
     cardFrame.appendChild(cardSuit);
     if(player.dealer){
+        if(!player.hand.length){
+            cardFrame.classList.add('hidden-frame');
+            cardValue.classList.add('hidden-card-front');
+            cardSuit.classList.add('hidden-card-front');
+        }
         document.getElementById('dealer-cards').appendChild(cardFrame);
     }else{
         document.getElementById('player-cards').appendChild(cardFrame);
@@ -348,6 +359,8 @@ const makeBets = (evt) => {
         choiceOptions.appendChild(surrenderBtn);
         doubleBtn.addEventListener('click',doubleBet);
         surrenderBtn.addEventListener('click',surrenderHand);
+        document.getElementById('dealer-cards').classList.add('show');
+        document.getElementById('player-cards').classList.add('show');
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;

@@ -88,4 +88,17 @@ body{
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: green;
+}
+
+.cards {
+    display: none;
+}
+
+.hidden-frame{
+    background-color: black;
+}
+
+.hidden-frame > p{
+    color: black;
 }
