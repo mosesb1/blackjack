@@ -153,17 +153,19 @@ const checkHands = () => {
 }
 
 const endHand = () => {
-    removeDouble();
+    removeDoubleBtn();
+    const cardFrames = document.querySelectorAll('#dealer-cards > .hidden-frame');
+    cardFrames.forEach(cardFrame => {
+        cardFrame.classList.remove('hidden-frame');
+    })
     choiceBtnsDiv.classList.remove('show');
     const gameResults = document.querySelector('#game-results > h1');
     const handResultsDiv = document.getElementById('hand-results');
     const gameResultsDiv = document.getElementById('game-results');
     newGameBtn.textContent = 'Start New Game';
-    resetHandDisplay();
-    currentBet = 50;
+    currentBet = currentPlayer.chips > 0 ? Math.min(currentPlayer.chips,50) : 50;
     document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
     document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
-
     if(!currentPlayer.chips){
         gameResults.textContent = 'You ran out of chips! Game over!';
         gameResultsDiv.classList.add('show');
@@ -192,6 +194,8 @@ const startNewGame = (evt) => {
 }
 
 const startNewHand = (evt) => {
+    document.getElementById('dealer-cards').classList.remove('show');
+    document.getElementById('player-cards').classList.remove('show');
     document.getElementById('hand-results').classList.remove('show');
     resetHandDivs();
     dealNewHands();
@@ -231,11 +235,6 @@ const resetHandDivs = () => {
     playerHand.appendChild(playerLabel);
 }
 
-const resetHandDisplay = () => {
-    const handUl = document.querySelector('#choices > ul');
-    choiceBtnsDiv.removeChild(handUl);
-}
-
 const evaluateResult = () => {
     let playerSum, dealerSum;
     [playerSum, dealerSum] = getPlayerHandSums();
@@ -261,10 +260,6 @@ const evaluateResult = () => {
 
 const executeDealerTurn = () => {
     let [playerSum, dealerSum] = getPlayerHandSums();
-    const cardFrames = document.querySelectorAll('#dealer-cards > .hidden-frame');
-    cardFrames.forEach(cardFrame => {
-        cardFrame.classList.remove('hidden-frame');
-    })
     while(dealerSum < 17){
         let newCard = drawCard(currentDealer);
         currentDealer.hand.push(newCard);
@@ -273,13 +268,13 @@ const executeDealerTurn = () => {
     console.log(currentDealer.hand);
 }
 
-const removeDouble = () => {
+const removeDoubleBtn = () => {
     if(document.querySelector('#choice-options > .double')){
         choiceOptions.removeChild(doubleBtn);
     }
 }
 
-const removeSurrender = () => {
+const removeSurrenderBtn = () => {
     if(document.querySelector('#choice-options > .surrender')){
         choiceOptions.removeChild(surrenderBtn);
     }
@@ -323,8 +318,8 @@ const doubleBet = (evt) => {
     currentPlayer.winChips(currentPlayer.bet);
     currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
     currentPlayer.makeBet();
-    removeDouble();
-    removeSurrender();
+    removeDoubleBtn();
+    removeSurrenderBtn();
 }
 
 const surrenderHand = (evt) => {
@@ -342,17 +337,10 @@ const chooseNumOfDecks = (evt) => {
 }
 
 const makeBets = (evt) => {
-    if(evt.target.textContent === 'Bet'){
+    if(evt.target.textContent === 'Submit Bet'){
         betBtnsDiv.classList.remove('show');
-        let currHand = document.createElement('ul');
-        currentPlayer.hand.forEach(card => {
-            let currCard = document.createElement('li');
-            currCard.textContent = card.name;
-            currHand.appendChild(currCard);
-        })
         currentPlayer.bet = currentBet;
         currentPlayer.makeBet();
-        choiceBtnsDiv.appendChild(currHand);
         choiceBtnsDiv.classList.add('show');
         checkHands();
         choiceOptions.appendChild(doubleBtn);
@@ -364,6 +352,8 @@ const makeBets = (evt) => {
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
+    } else if(evt.target.textContent === 'Bet All Chips') {
+        currentBet = currentPlayer.chips;
     } else {
         currentBet = currentBet - parseInt(evt.target.textContent.slice(1)) >= 50 ? currentBet - parseInt(evt.target.textContent.slice(1)): Math.min(50,currentPlayer.chips);
     }
@@ -372,13 +362,10 @@ const makeBets = (evt) => {
 
 const makeChoices = (evt) => {
     if(evt.target.textContent === 'Hit'){
-        removeDouble();
-        removeSurrender();
+        removeDoubleBtn();
+        removeSurrenderBtn();
         let newCard = drawCard(currentPlayer);
         currentPlayer.hand.push(newCard);
-        let newCardEl = document.createElement('li');
-        newCardEl.textContent = currentPlayer.hand[currentPlayer.hand.length-1].name;
-        document.querySelector('#choices > ul').appendChild(newCardEl)
         document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';

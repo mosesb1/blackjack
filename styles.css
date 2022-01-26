@@ -47,7 +47,10 @@ div > button {
 
 #bet-options{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 100px 100px 100px 100px 100px;
+    grid-template-rows: 50px 50px;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 .card{
@@ -100,5 +103,35 @@ body{
 }
 
 .hidden-frame > p{
+    color: black;
+}
+
+#bet-options > button{
+    font-size: .85em;
+    font-weight: bold;
+    background-color: #FFDB58;
+}
+
+.add-bet{
+    width: 100px;
+    height: 50px;
+    color:black;
+}
+
+.subtract-bet{
+    width: 100px;
+    height: 50px;
+    color: red;
+}
+
+.submit-bet{
+    width: 100px;
+    height: 50px;
+    color: black;
+}
+
+.max-bet{
+    width: 100px;
+    height: 50px;
     color: black;
 }
