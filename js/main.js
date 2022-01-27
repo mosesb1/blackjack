@@ -51,11 +51,11 @@ class Deck {
         }
     }
     static shuffleDeck(){
-        let currentIdx = Deck.deck.length, randomIdx;
-        while(currentIdx !== 0) {
-            randomIdx = Math.floor(Math.random()*currentIdx);
-            currentIdx--;
-            [Deck.deck[currentIdx], Deck.deck[randomIdx]] = [Deck.deck[randomIdx], Deck.deck[currentIdx]];
+        let unrandomizedLength = Deck.deck.length, randomIdx;
+        while(unrandomizedLength !== 0) {
+            randomIdx = Math.floor(Math.random()*unrandomizedLength);
+            unrandomizedLength--;
+            [Deck.deck[unrandomizedLength], Deck.deck[randomIdx]] = [Deck.deck[randomIdx], Deck.deck[unrandomizedLength]];
         }
         // Fisher-Yates shuffle algorithm
     }
