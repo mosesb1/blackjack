@@ -85,8 +85,8 @@ const initializeGame = (numOfDecks) => {
     }
     currentPlayer = Player.players[0];
     currentDealer = Player.players[1];
-    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
-    document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
+    bettingHead3.textContent = `Current bet: ${currentBet}. Minimum bet is 50`
+    bettingHead4.textContent = `Current chip count: ${currentPlayer.chips}`
 }
 
 const getPlayerHandSums = () => {
@@ -131,21 +131,16 @@ const getPlayerHandSums = () => {
 const checkHands = () => {
     let playerSum, dealerSum
     [playerSum, dealerSum] = getPlayerHandSums();
-    const handResult = document.querySelector('#hand-results > h1');
-    const handSums = document.querySelector('#hand-results > h2');
     if(playerSum === 21 && dealerSum === 21){
         currentPlayer.winChips(currentPlayer.bet);
-        handResult.textContent = 'You and the dealer got a blackjack! It\'s a push!';
-        handSums.textContent = '';
+        handResultsHead.textContent = 'You and the dealer got a blackjack! It\'s a push!';
         endHand();
     } else if (playerSum === 21){
         currentPlayer.winChips(2.5 * currentPlayer.bet);
-        handResult.textContent = `You got a blackjack! You won ${1.5*currentPlayer.bet}!`;
-        handSums.textContent = '';
+        handResultsHead.textContent = `You got a blackjack! You won ${1.5*currentPlayer.bet}!`;
         endHand();
     } else if (dealerSum === 21){
-        handResult.textContent = 'Dealer got a blackjack!';
-        handSums.textContent = '';
+        handResultsHead.textContent = 'Dealer got a blackjack!';
         endHand();
     }
 }
@@ -157,21 +152,18 @@ const endHand = () => {
         cardFrame.classList.remove('hidden-frame');
     })
     choiceBtnsDiv.classList.remove('show');
-    const gameResults = document.querySelector('#game-results > h1');
-    const handResultsDiv = document.getElementById('hand-results');
-    const gameResultsDiv = document.getElementById('game-results');
     newGameBtn.textContent = 'Start New Game';
     currentBet = currentPlayer.chips > 0 ? Math.min(currentPlayer.chips,50) : 50;
-    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`
-    document.querySelector('#betting > h4').textContent = `Current chip count: ${currentPlayer.chips}`
+    bettingHead3.textContent = `Current bet: ${currentBet}. Minimum bet is 50`
+    bettingHead4.textContent = `Current chip count: ${currentPlayer.chips}`
     if(!currentPlayer.chips){
-        gameResults.textContent = 'You ran out of chips! Game over!';
-        gameResultsDiv.classList.add('show');
+        gameResultsHead.textContent = 'You ran out of chips! Game over!';
+        gameResults.classList.add('show');
     } else if(currentPlayer.chips > chipGoal){
-        gameResults.textContent = `You passed 10000 chips! You win!`;
-        gameResultsDiv.classList.add('show');
+        gameResultsHead.textContent = `You passed 10000 chips! You win!`;
+        gameResults.classList.add('show');
     } else{
-        handResultsDiv.classList.add('show');
+        handResults.classList.add('show');
         return
     }
 }
@@ -179,7 +171,7 @@ const endHand = () => {
 const startNewGame = (evt) => {
     dealerCards.classList.remove('show');
     playerCards.classList.remove('show');
-    document.getElementById('game-results').classList.remove('show');
+    gameResults.classList.remove('show');
     difficultyDiv.classList.remove('hide');
     while(dealerCards.hasChildNodes()){
         dealerCards.removeChild(dealerCards.lastChild);
@@ -192,7 +184,7 @@ const startNewGame = (evt) => {
 const startNewHand = (evt) => {
     dealerCards.classList.remove('show');
     playerCards.classList.remove('show');
-    document.getElementById('hand-results').classList.remove('show');
+    handResults.classList.remove('show');
     resetHandDivs();
     dealNewHands();
     betBtnsDiv.classList.add('show');
@@ -215,8 +207,6 @@ const dealNewHands = () => {
 }
 
 const resetHandDivs = () => {
-    const dealerLabel = document.createElement('h2');
-    const playerLabel = document.createElement('h2');
     while(dealerCards.hasChildNodes()){
         dealerCards.removeChild(dealerCards.lastChild);
     }
@@ -228,17 +218,16 @@ const resetHandDivs = () => {
 const evaluateResult = () => {
     let playerSum, dealerSum;
     [playerSum, dealerSum] = getPlayerHandSums();
-    const handResults = document.querySelector('#hand-results > h1');
     if(dealerSum > 21){
-        handResults.textContent = `The dealer busts! You win ${currentPlayer.bet} chips!`;
+        handResultsHead.textContent = `The dealer busts! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
     } else if(dealerSum === playerSum){
-        handResults.textContent = `It's a push! You get your ${currentPlayer.bet} chips back!`;
+        handResultsHead.textContent = `It's a push! You get your ${currentPlayer.bet} chips back!`;
         currentPlayer.winChips(currentPlayer.bet);
     } else if(dealerSum > playerSum){
-        handResults.textContent = `The dealer wins! You lose ${currentPlayer.bet} chips!`;
+        handResultsHead.textContent = `The dealer wins! You lose ${currentPlayer.bet} chips!`;
     } else {
-        handResults.textContent = `You win! You win ${currentPlayer.bet} chips!`;
+        handResultsHead.textContent = `You win! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
     }
     endHand();
@@ -309,7 +298,7 @@ const doubleBet = (evt) => {
 
 const surrenderHand = (evt) => {
     currentPlayer.winChips(.5*currentPlayer.bet);
-    document.querySelector('#hand-results > h1').textContent = `You surrendered the hand! You got back ${.5*currentPlayer.bet} chips!`;
+    handResultsHead.textContent = `You surrendered the hand! You got back ${.5*currentPlayer.bet} chips!`;
     endHand();
 }
 
@@ -340,7 +329,7 @@ const makeBets = (evt) => {
     } else {
         currentBet = currentBet - parseInt(evt.target.textContent.slice(1)) >= 50 ? currentBet - parseInt(evt.target.textContent.slice(1)): Math.min(50,currentPlayer.chips);
     }
-    document.querySelector('#betting > h3').textContent = `Current bet: ${currentBet}. Minimum bet is 50`;
+    bettingHead3.textContent = `Current bet: ${currentBet}. Minimum bet is 50`;
 }
 
 const makeChoices = (evt) => {
@@ -350,10 +339,10 @@ const makeChoices = (evt) => {
         let newCard = drawCard(currentPlayer);
         currentPlayer.hand.push(newCard);
         if(currentPlayer.isBusted()){
-            document.querySelector('#hand-results > h1').textContent = 'Bust!';
+            handResultsHead.textContent = 'Bust!';
             endHand();
         } else if(currentPlayer.hand.length >= 5){
-            document.querySelector('#hand-results > h1').textContent = `Five card Charlie! You win ${2*currentPlayer.bet}!`;
+            handResultsHead.textContent = `Five card Charlie! You win ${2*currentPlayer.bet}!`;
             currentPlayer.winChips(3*currentPlayer.bet);
             endHand();
         }
@@ -371,6 +360,12 @@ const chooseDifficulty = (evt) => {
 }
 
 let numOfDecks;
+const bettingHead3 = document.querySelector('#betting > h3');
+const bettingHead4 = document.querySelector('#betting > h4');
+const handResultsHead = document.querySelector('#hand-results > h1');
+const gameResultsHead = document.querySelector('#game-results > h1');
+const gameResults = document.getElementById('game-results');
+const handResults = document.getElementById('hand-results');
 const playerCards = document.getElementById('player-cards');
 const dealerCards = document.getElementById('dealer-cards');
 const difficultyBtns = document.querySelectorAll('#chip-total > button');
