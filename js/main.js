@@ -160,7 +160,7 @@ const endHand = () => {
         gameResultsHead.textContent = 'You ran out of chips! Game over!';
         gameResults.classList.add('show');
     } else if(currentPlayer.chips > chipGoal){
-        gameResultsHead.textContent = `You passed 10000 chips! You win!`;
+        gameResultsHead.textContent = `You passed ${chipGoal} chips! You win!`;
         gameResults.classList.add('show');
     } else{
         handResults.classList.add('show');
