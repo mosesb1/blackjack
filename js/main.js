@@ -217,26 +217,18 @@ const dealNewHands = () => {
 const resetHandDivs = () => {
     const dealerLabel = document.createElement('h2');
     const playerLabel = document.createElement('h2');
-    dealerLabel.textContent = 'Dealer:';
-    playerLabel.textContent = 'Player:';
     while(dealerCards.hasChildNodes()){
         dealerCards.removeChild(dealerCards.lastChild);
     }
     while(playerCards.hasChildNodes()){
         playerCards.removeChild(playerCards.lastChild);
     }
-    dealerCards.appendChild(dealerLabel);
-    playerCards.appendChild(playerLabel);
 }
 
 const evaluateResult = () => {
     let playerSum, dealerSum;
     [playerSum, dealerSum] = getPlayerHandSums();
     const handResults = document.querySelector('#hand-results > h1');
-    const handSums = document.querySelector('#hand-results > h2');
-    const handSums2 = document.querySelector('#game-results > h2');
-    handSums.textContent = `Your hand: ${playerSum}. The dealer's hand: ${dealerSum}.`;
-    handSums2.textContent = `Your hand: ${playerSum}. The dealer's hand: ${dealerSum}.`;
     if(dealerSum > 21){
         handResults.textContent = `The dealer busts! You win ${currentPlayer.bet} chips!`;
         currentPlayer.winChips(2*currentPlayer.bet);
@@ -341,7 +333,6 @@ const makeBets = (evt) => {
         surrenderBtn.addEventListener('click',surrenderHand);
         dealerCards.classList.add('show');
         playerCards.classList.add('show');
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else if(evt.target.textContent === 'Bet All Chips') {
@@ -358,15 +349,11 @@ const makeChoices = (evt) => {
         removeSurrenderBtn();
         let newCard = drawCard(currentPlayer);
         currentPlayer.hand.push(newCard);
-        document.querySelector('#choices > h2').textContent = `Current hand total: ${getPlayerHandSums()[0]}. Dealer's visible card: ${currentDealer.hand[0].name}.`;
         if(currentPlayer.isBusted()){
             document.querySelector('#hand-results > h1').textContent = 'Bust!';
-            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
-            document.querySelector('#game-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
             endHand();
         } else if(currentPlayer.hand.length >= 5){
             document.querySelector('#hand-results > h1').textContent = `Five card Charlie! You win ${2*currentPlayer.bet}!`;
-            document.querySelector('#hand-results > h2').textContent = `Your hand: ${getPlayerHandSums()[0]}.`;
             currentPlayer.winChips(3*currentPlayer.bet);
             endHand();
         }

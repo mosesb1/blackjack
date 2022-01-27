@@ -8,9 +8,8 @@
     <script defer src="./js/main.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="flex">
     <div class="cards" id="dealer-cards"></div>
-    <div class="cards" id="player-cards"></div>
     <div id="choose-difficulty">
         <h1>Enter the chip total that wins the game:</h1>
         <div id="chip-total">
@@ -44,7 +43,6 @@
         </div>
     </div>
     <div id="choices">
-        <h2></h2>
         <div id="choice-options">
             <button class="hit">Hit</button>
             <button class="stand">Stand</button> 
@@ -52,13 +50,12 @@
     </div>
     <div id="hand-results">
         <h1></h1>
-        <h2></h2>
         <button>Start New Hand</button>
     </div>
     <div id="game-results">
         <h1></h1>
-        <h2></h2>
         <button>Start New Game</button>
     </div>
+    <div class="cards" id="player-cards"></div>
 </body>
 </html>
