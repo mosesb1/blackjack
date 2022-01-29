@@ -278,8 +278,6 @@ const createCard = (card, player) => {
     if(player.dealer){
         if(!player.hand.length){
             cardFrame.classList.add('hidden-frame');
-            cardValue.classList.add('hidden-card-front');
-            cardSuit.classList.add('hidden-card-front');
         }
         dealerCards.appendChild(cardFrame);
     }else{

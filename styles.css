@@ -114,7 +114,7 @@ body{
 }
 
 .hidden-frame > p{
-    color: black;
+    display: none;
 }
 
 #bet-options > button{
