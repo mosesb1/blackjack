@@ -291,6 +291,7 @@ const doubleBet = (evt) => {
     currentPlayer.winChips(currentPlayer.bet);
     currentPlayer.bet = currentPlayer.bet * 2 <= currentPlayer.chips ? currentPlayer.bet * 2 : currentPlayer.chips;
     currentPlayer.makeBet();
+    choicesHead.innerHTML = `Current chip total: ${currentPlayer.chips} </br> Current bet: ${currentPlayer.bet}`
     removeDoubleBtn();
     removeSurrenderBtn();
 }
@@ -321,6 +322,10 @@ const makeBets = (evt) => {
         surrenderBtn.addEventListener('click',surrenderHand);
         dealerCards.classList.add('show');
         playerCards.classList.add('show');
+        choicesHead.innerHTML = `Current chip total: ${currentPlayer.chips} </br> Current bet: ${currentBet}`;
+        if(!currentPlayer.chips){
+            removeDoubleBtn();
+        }
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else if(evt.target.textContent === 'Bet All Chips') {
@@ -359,6 +364,7 @@ const chooseDifficulty = (evt) => {
 }
 
 let numOfDecks;
+const choicesHead = document.querySelector('#choices > h2');
 const bettingHead3 = document.querySelector('#betting > h3');
 const bettingHead4 = document.querySelector('#betting > h4');
 const handResultsHead = document.querySelector('#hand-results > h1');
