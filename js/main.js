@@ -164,7 +164,6 @@ const endHand = () => {
         gameResults.classList.add('show');
     } else{
         handResults.classList.add('show');
-        return
     }
 }
 
