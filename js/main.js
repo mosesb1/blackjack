@@ -316,8 +316,6 @@ const makeBets = (evt) => {
         checkHands();
         choiceOptions.appendChild(doubleBtn);
         choiceOptions.appendChild(surrenderBtn);
-        doubleBtn.addEventListener('click',doubleBet);
-        surrenderBtn.addEventListener('click',surrenderHand);
         dealerCards.classList.add('show');
         playerCards.classList.add('show');
         choicesHead.innerHTML = `Current chip total: ${currentPlayer.chips} </br> Current bet: ${currentBet}`;
@@ -409,3 +407,5 @@ choiceBtns.forEach(choiceBtn => {
 
 newHandBtn.addEventListener('click',startNewHand);
 newGameBtn.addEventListener('click',startNewGame);
+doubleBtn.addEventListener('click',doubleBet);
+surrenderBtn.addEventListener('click',surrenderHand);
