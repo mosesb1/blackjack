@@ -49,7 +49,7 @@ Once you stand, the dealer will use the following logic to hit/stand:
 - Hit if current hand total is less than 17
 - Stand otherwise
 
-## How you win
+## How you win the hand
 There are 4 ways to win:
 - Get a blackjack (21 in your opening hand)
 - Dealer bust
