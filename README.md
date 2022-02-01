@@ -1,6 +1,11 @@
 # Blackjack by Moses Burkhart
 
-## Technology Used: HTML/CSS/JavaScript VSCode Github
+## Technology Used: 
+- HTML
+- CSS
+- JavaScript
+- VSCode
+- Github
 
 # Rules:
 
