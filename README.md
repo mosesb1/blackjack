@@ -1,6 +1,6 @@
 # Blackjack by Moses Burkhart
 
-## Technology Used: 
+# Technology Used: 
 - HTML
 - CSS
 - JavaScript
