@@ -1,4 +1,6 @@
-# Technology Used: HTML/CSS/JavaScript VSCode Github
+# Blackjack by Moses Burkhart
+
+## Technology Used: HTML/CSS/JavaScript VSCode Github
 
 # Rules:
 
@@ -39,8 +41,8 @@ If you feel that your opening hand is too risky to hit/stand, you may surrender 
 
 ## The dealer's turn
 Once you stand, the dealer will use the following logic to hit/stand:
-- hit if current hand total is less than 17
-- stand otherwise
+- Hit if current hand total is less than 17
+- Stand otherwise
 
 ## How you win
 There are 4 ways to win:
