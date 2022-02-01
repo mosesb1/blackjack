@@ -42,7 +42,7 @@ If you did not bet all your chips, you may double your bet *before* you choose t
 If you do not have enough chips to double your current bet, it will bet the rest of your chips instead.
 
 ### Surrender
-If you feel that your opening hand is too risky to hit/stand, you may surrender the turn. This will return half of your bet and end the turn. Similar to double, you may only surrender *before* you choose to hit. Doubling your bet will also prevent you from surrendering the hand.
+If you feel that your opening hand is too risky to hit/stand, you may surrender the turn. This will return half of your bet and end the turn. Similar to double, you may only surrender *before* you choose to hit. Doubling your bet will also prevent you from surrendering the hand. You may not surrender on bets lower than 50 chips.
 
 ## The dealer's turn
 Once you stand, the dealer will use the following logic to hit/stand:
