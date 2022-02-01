@@ -322,6 +322,9 @@ const makeBets = (evt) => {
         if(!currentPlayer.chips){
             removeDoubleBtn();
         }
+        if(currentBet < 50){
+            removeSurrenderBtn();
+        }
     } else if(evt.target.textContent[0] === '+'){
         currentBet = currentBet + parseInt(evt.target.textContent.slice(1))<= currentPlayer.chips ? currentBet + parseInt(evt.target.textContent.slice(1)): currentPlayer.chips;
     } else if(evt.target.textContent === 'Bet All Chips') {
